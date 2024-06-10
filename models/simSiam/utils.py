@@ -9,7 +9,6 @@ from typing import Any
 from torch.utils.data import Dataset
 import glob
 from PIL import Image
-from torch import nn
 
 
 def seed_everything(seed):
@@ -64,14 +63,12 @@ class ProgressMeter(object):
         self.meters = meters
         self.prefix = prefix
 
-    def display(self, cur_batch):
-        entries = [self.prefix + self.batch_fmtstr.format(cur_batch)]
+    def display(self, batch):
+        entries = [self.prefix + self.batch_fmtstr.format(batch)]
         entries += [str(meter) for meter in self.meters]
         print('\t'.join(entries))
-        # {prefix} {[cur_batch/num_batches]} {meter1} {meter2}
 
     def _get_batch_fmtstr(self, num_batches):
-        # [ cur_batch / num_batches]
         num_digits = len(str(num_batches // 1))
         fmt = '{:' + str(num_digits) + 'd}'
         return '[' + fmt + '/' + fmt.format(num_batches) + ']'
@@ -87,11 +84,8 @@ def train(train_loader, model, criterion, optimizer, epoch, args):
         [batch_time, data_time, losses],
         prefix="Epoch: [{}]".format(epoch)
     )
-    
     model.train()
-    
     end = time.time()
-    
     for i, (images, _) in enumerate(train_loader):
         data_time.update(time.time() - end)
         
@@ -136,7 +130,3 @@ class ImageNetDataset(Dataset):
     
     def __getitem__(self, index) -> Any:
         return Image.open(self.image_list[index])
-
-
-class NCEAverage(nn.Module):
-    pass
